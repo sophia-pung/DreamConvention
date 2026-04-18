@@ -267,7 +267,7 @@ nav {
   position: relative;
   top: 0.02em;
   width: 0.23em;
-  height: 0.72em;
+  height: 0.74em;
   border: 1.5px solid var(--gold);
   position: relative;
   margin: 0 0.01em;
@@ -278,8 +278,8 @@ nav {
   border: 1.5px solid var(--gold);
   display: block;
 }
-.hero-i::before { content: ''; inset: 0.03em; }
-.hero-i > span  { inset: 0.06em; }
+.hero-i::before { content: ''; inset: 0.018em; }
+.hero-i > span  { inset: 0.036em; }
 
 .hero-subtitle {
   font-family: "Playfair Display", serif;
@@ -866,7 +866,7 @@ section {
   opacity: 0.6;
 }
 
-/* ── Register ───────────────────────────────────────────────────────── */
+/* ── Register / Application ─────────────────────────────────────────── */
 .register-section {
   text-align: center;
   padding: 8rem var(--pad);
@@ -893,7 +893,7 @@ section {
 .register-section .register-body {
   color: var(--muted);
   font-size: 1rem;
-  max-width: 460px;
+  max-width: 520px;
   margin: 1.5rem auto 3rem;
   line-height: 1.7;
 }
@@ -901,6 +901,144 @@ section {
   font-size: 0.85rem;
   padding: 1.2rem 3rem;
 }
+
+/* ── Application form ───────────────────────────────────────────────── */
+.application-form {
+  position: relative;
+  z-index: 1;
+  max-width: 780px;
+  margin: 0 auto;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.form-group--full {
+  grid-column: 1 / -1;
+}
+.form-group label {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 0.85rem 1rem;
+  color: var(--white);
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.form-group select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235bc4f5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+.form-group select option {
+  background: #0b1220;
+  color: var(--white);
+}
+.form-group textarea {
+  resize: vertical;
+  min-height: 130px;
+  line-height: 1.6;
+}
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(91, 196, 245, 0.12);
+}
+
+/* Meal radio buttons */
+.meal-options {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.meal-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  transition: border-color 0.2s, background 0.2s;
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.95rem;
+  color: var(--white);
+  user-select: none;
+}
+.meal-option:has(input:checked) {
+  border-color: var(--gold);
+  background: rgba(91, 196, 245, 0.07);
+}
+.meal-option input[type="radio"] {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+  transition: border-color 0.2s;
+  padding: 0;
+  background: none;
+}
+.meal-option input[type="radio"]:checked {
+  border-color: var(--gold);
+}
+.meal-option input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+/* Form footer & status */
+.form-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+.form-status {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.9rem;
+  min-height: 1.4em;
+}
+.form-status--success { color: #5bc4f5; }
+.form-status--error   { color: #f87171; }
 
 /* ── Footer ─────────────────────────────────────────────────────────── */
 footer {
@@ -1070,9 +1208,10 @@ footer {
   /* Venue */
   .venue-map-placeholder { aspect-ratio: 3 / 2; }
 
-  /* Register */
+  /* Register / form */
   .register-section { padding: 5rem var(--pad); }
   .btn-register { font-size: 0.78rem; padding: 1rem 2rem; }
+  .form-row { grid-template-columns: 1fr; }
 }
 
 /* ── Touch devices — disable custom cursor ──────────────────────────── */

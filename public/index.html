@@ -28,6 +28,7 @@
       rel="stylesheet"
     />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -325,7 +326,7 @@
           <div class="mystery-badge">Serial Founders</div>
           <div class="mystery-badge">Industry Leaders</div>
           <div class="mystery-badge">Investors</div>
-          <div class="mystery-badge">Revealed May 1st</div>
+          <div class="mystery-badge">Revealed May 3rd</div>
         </div>
       </div>
     </section>
@@ -384,16 +385,88 @@
 
     <div class="divider"></div>
 
-    <!-- REGISTER -->
+    <!-- REGISTER / APPLICATION -->
     <section id="register" class="register-section">
       <div class="section-label section-label--center">Limited Spots Available</div>
-      <h2 class="section-heading">Ready to<br />Dream Bigger?</h2>
+      <h2 class="section-heading">Apply to<br />Dream Convention</h2>
       <p class="register-body">
         This is your chance to pitch in front of real founders, learn from four
-        CEOs, and compete for serious prize money. Don't watch from the
-        sidelines.
+        CEOs, and compete for serious prize money. Fill out the form below —
+        we'll review every application personally.
       </p>
-      <a href="#" class="btn-primary btn-register">Register Your Team</a>
+
+      <form class="application-form" id="applicationForm" novalidate>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="app-name">Full Name</label>
+            <input type="text" id="app-name" name="name" placeholder="Jane Smith" required />
+          </div>
+          <div class="form-group">
+            <label for="app-email">Email Address</label>
+            <input type="email" id="app-email" name="email" placeholder="jane@university.edu" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="app-phone">Phone Number</label>
+            <input type="tel" id="app-phone" name="phone" placeholder="+1 (555) 000-0000" required />
+          </div>
+          <div class="form-group">
+            <label for="app-school">School</label>
+            <input type="text" id="app-school" name="school" placeholder="University of St. Thomas" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="app-grade">Year / Grade</label>
+            <select id="app-grade" name="grade" required>
+              <option value="" disabled selected>Select your year</option>
+              <option value="Freshman">Freshman</option>
+              <option value="Sophomore">Sophomore</option>
+              <option value="Junior">Junior</option>
+              <option value="Senior">Senior</option>
+              <option value="Graduate">Graduate</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="app-major">Major</label>
+            <input type="text" id="app-major" name="major" placeholder="Business Administration" required />
+          </div>
+        </div>
+
+        <div class="form-group form-group--full">
+          <label for="app-why">Why do you want to attend Dream Convention?</label>
+          <textarea id="app-why" name="why" rows="5"
+            placeholder="Tell us what drives you, what you're building, and why this matters to you…"
+            required></textarea>
+        </div>
+
+        <div class="form-group form-group--full">
+          <label>Meal Preference</label>
+          <div class="meal-options">
+            <label class="meal-option">
+              <input type="radio" name="meal" value="Meat" required />
+              <span>Meat</span>
+            </label>
+            <label class="meal-option">
+              <input type="radio" name="meal" value="Vegetarian" />
+              <span>Vegetarian</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" class="btn-primary btn-register" id="submitBtn">
+            Submit Application
+          </button>
+          <p class="form-status" id="formStatus" aria-live="polite"></p>
+        </div>
+
+      </form>
     </section>
 
     <!-- FOOTER -->
@@ -604,6 +677,79 @@
         el.style.transition = `opacity 0.7s ease ${i * 0.04}s, transform 0.7s ease ${i * 0.04}s`;
         observer.observe(el);
       });
+    </script>
+
+    <!-- ── Application form × Supabase ───────────────────────────────── -->
+    <script>
+      // TODO: replace these two values with your real Supabase project credentials
+      // Dashboard → Project Settings → API
+      const SUPABASE_URL  = 'https://xlnsnloysokcehkqmdrp.supabase.co';       // e.g. https://xxxx.supabase.co
+      const SUPABASE_KEY  = 'sb_publishable_Wg8rPk4Qt-kAqRw9AYiMpQ_tRUUExsc';  // public anon key (safe to expose)
+
+      // Supabase table expected schema (create in Table Editor):
+      //   applications
+      //     id              uuid  primary key  default gen_random_uuid()
+      //     full_name       text  not null
+      //     email           text  not null
+      //     phone           text
+      //     school          text
+      //     grade           text
+      //     major           text
+      //     why_attend      text
+      //     meal_preference text
+      //     created_at      timestamptz  default now()
+
+      (function () {
+        const form   = document.getElementById('applicationForm');
+        const status = document.getElementById('formStatus');
+        const btn    = document.getElementById('submitBtn');
+
+        if (!form) return;
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          if (!form.checkValidity()) { form.reportValidity(); return; }
+
+          btn.disabled    = true;
+          btn.textContent = 'Submitting…';
+          status.textContent = '';
+          status.className   = 'form-status';
+
+          const payload = {
+            full_name:       form.name.value.trim(),
+            email:           form.email.value.trim(),
+            phone:           form.phone.value.trim(),
+            school:          form.school.value.trim(),
+            grade:           form.grade.value,
+            major:           form.major.value.trim(),
+            why_attend:      form.why.value.trim(),
+            meal_preference: form.meal.value,
+          };
+
+          try {
+            // Guard: skip real insert until credentials are filled in
+            if (SUPABASE_URL === 'YOUR_SUPABASE_URL') {
+              console.table(payload);
+              throw new Error('Supabase credentials not yet configured — see console for payload.');
+            }
+
+            const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            const { error } = await db.from('Dream Convention').insert([payload]);
+            if (error) throw error;
+
+            form.reset();
+            btn.textContent = 'Application Submitted ✓';
+            status.textContent  = "You're in! We'll review your application and be in touch soon.";
+            status.classList.add('form-status--success');
+          } catch (err) {
+            console.error(err);
+            status.textContent = err.message || 'Something went wrong — please try again.';
+            status.classList.add('form-status--error');
+            btn.disabled    = false;
+            btn.textContent = 'Submit Application';
+          }
+        });
+      })();
     </script>
   </body>
 </html>
