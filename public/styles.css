@@ -254,11 +254,32 @@ nav {
   max-width: 100%;
   overflow: hidden;
 }
-.hero-title span {
+.hero-title > span {
   display: block;
   -webkit-text-stroke: 1px var(--gold);
   color: transparent;
 }
+
+/* Fake the 3-concentric-rect detail the font draws inside other letters */
+.hero-i {
+  display: inline-block;
+  vertical-align: top;
+  position: relative;
+  top: 0.02em;
+  width: 0.23em;
+  height: 0.72em;
+  border: 1.5px solid var(--gold);
+  position: relative;
+  margin: 0 0.01em;
+}
+.hero-i::before,
+.hero-i > span {
+  position: absolute;
+  border: 1.5px solid var(--gold);
+  display: block;
+}
+.hero-i::before { content: ''; inset: 0.03em; }
+.hero-i > span  { inset: 0.06em; }
 
 .hero-subtitle {
   font-family: "Playfair Display", serif;
